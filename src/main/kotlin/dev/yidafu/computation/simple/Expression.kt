@@ -1,4 +1,4 @@
-package dev.yidafu.computation
+package dev.yidafu.computation.simple
 
 interface Node {
 
@@ -26,7 +26,7 @@ interface Statement : Node {
 }
 
 
-class Bool(val value: Boolean) : Expression{
+class Bool(val value: Boolean) : Expression {
     override fun reducible(): Boolean = false
 
     override fun reduce(env: Environment): Pair<Expression, Environment> {
@@ -80,7 +80,7 @@ class Add(val left: Expression, val right: Expression) : Expression {
     }
 }
 
-class Multiply(val left: Expression, val right: Expression) : Expression{
+class Multiply(val left: Expression, val right: Expression) : Expression {
     override fun reducible(): Boolean = true
     override fun reduce(env: Environment): Pair<Expression, Environment> {
         return if (left.reducible()) {
@@ -103,7 +103,7 @@ class Multiply(val left: Expression, val right: Expression) : Expression{
 }
 
 
-class LessThan(val left: Expression, val right: Expression) : Expression{
+class LessThan(val left: Expression, val right: Expression) : Expression {
     override fun reducible(): Boolean = true
 
     override fun reduce(env: Environment): Pair<Expression, Environment> {
@@ -127,7 +127,7 @@ class LessThan(val left: Expression, val right: Expression) : Expression{
     }
 }
 
-class Variable(val name: String) :Expression {
+class Variable(val name: String) : Expression {
     override fun reducible(): Boolean = true
 
     override fun reduce(env: Environment): Pair<Expression, Environment> {

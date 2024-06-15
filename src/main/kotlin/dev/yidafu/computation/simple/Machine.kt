@@ -1,4 +1,4 @@
-package dev.yidafu.computation
+package dev.yidafu.computation.simple
 
 
 class Machine(var stat: Node, var env: Environment) {

@@ -1,4 +1,4 @@
-package dev.yidafu.computation
+package dev.yidafu.computation.simple
 
 class Environment(vararg pairs: Pair<String, Expression>) : MutableMap<String, Expression> by mutableMapOf(*pairs) {
     constructor(map: Map<String, Expression>) : this() {

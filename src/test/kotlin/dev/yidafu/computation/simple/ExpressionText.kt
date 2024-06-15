@@ -1,10 +1,9 @@
-import dev.yidafu.computation.*
-import dev.yidafu.computation.Number
+package dev.yidafu.computation.simple
+
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.extensions.system.captureStandardOut
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -35,10 +34,17 @@ class ExpressionText : ShouldSpec({
         }
 
         should("reduce to 14") {
-            val expr: Expression = Add(
-                Multiply(Number(1), Number(2)),
-                Multiply(Number(3), Number(4)),
-            )
+            val expr: Expression =
+                Add(
+                    Multiply(
+                        Number(1),
+                        Number(2)
+                    ),
+                    Multiply(
+                        Number(3),
+                        Number(4)
+                    ),
+                )
             val env = Environment();
             expr.inspect() shouldBe  "«1 * 2 + 3 * 4»"
             var res = expr.reduce(env)
@@ -60,10 +66,17 @@ class ExpressionText : ShouldSpec({
 
     context("Machine execute expression") {
         should("reduce to 14") {
-            val expr: Expression = Add(
-                Multiply(Number(1), Number(2)),
-                Multiply(Number(3), Number(4)),
-            )
+            val expr: Expression =
+                Add(
+                    Multiply(
+                        Number(1),
+                        Number(2)
+                    ),
+                    Multiply(
+                        Number(3),
+                        Number(4)
+                    ),
+                )
             val out = captureStandardOut {
                 Machine(expr, Environment()).run()
             }
@@ -78,7 +91,13 @@ class ExpressionText : ShouldSpec({
         should("reduce to false") {
             val out = captureStandardOut {
                 Machine(
-                    LessThan(Number(5), Add(Number(2), Number(2))),
+                    LessThan(
+                        Number(5),
+                        Add(
+                            Number(2),
+                            Number(2)
+                        )
+                    ),
                     Environment(),
                 ).run()
             }
@@ -92,7 +111,11 @@ class ExpressionText : ShouldSpec({
         should("reduce variable in environment") {
             val output = captureStandardOut {
                 Machine(
-                    Add(Variable("x"), Variable("y")),
+                    Add(
+                        Variable(
+                            "x"
+                        ), Variable("y")
+                    ),
                     env("x" to Number(3), "y" to Number(4))
                 ).run()
             }
@@ -110,7 +133,13 @@ class ExpressionText : ShouldSpec({
 
             val output = captureStandardOut {
                 Machine(
-                    Assign("x", Add(Variable("x"), Number(1))),
+                    Assign(
+                        "x",
+                        Add(
+                            Variable("x"),
+                            Number(1)
+                        )
+                    ),
                     env("x" to Number(2))
                 ).run()
             }
@@ -147,8 +176,20 @@ class ExpressionText : ShouldSpec({
             val output = captureStandardOut {
                 Machine(
                     Sequence(
-                        Assign("x", Add(Number(1), Number(1))),
-                        Assign("y", Add(Variable("x"), Number(3)))
+                        Assign(
+                            "x",
+                            Add(
+                                Number(1),
+                                Number(1)
+                            )
+                        ),
+                        Assign(
+                            "y",
+                            Add(
+                                Variable("x"),
+                                Number(3)
+                            )
+                        )
                     ),
                     env()
                 ).run()
@@ -169,8 +210,17 @@ class ExpressionText : ShouldSpec({
             val output = captureStandardOut {
                 Machine(
                     While(
-                        LessThan(Variable("x"), Number(5)),
-                        Assign("x", Multiply(Variable("x"), Number(3)))
+                        LessThan(
+                            Variable("x"),
+                            Number(5)
+                        ),
+                        Assign(
+                            "x",
+                            Multiply(
+                                Variable("x"),
+                                Number(3)
+                            )
+                        )
                     ),
                     env("x" to Number(1))
                 ).run()
@@ -209,14 +259,19 @@ class ExpressionText : ShouldSpec({
         }
 
         should("execute variable expression") {
-            val expr = Variable("x", ).evaluate(env("x" to Number(23)))
+            val expr = Variable("x",)
+                .evaluate(env("x" to Number(23)))
             expr.shouldBeInstanceOf<Number>()
             expr.value shouldBe 23
         }
 
         should("execute lessthan expression") {
             val expr = LessThan(
-                Add(Variable("x"), Number(2)),
+                Add(
+                    Variable(
+                        "x"
+                    ), Number(2)
+                ),
                 Variable("y")
             ).evaluate(env("x" to Number(2), "y" to Number(5)))
 
@@ -226,8 +281,16 @@ class ExpressionText : ShouldSpec({
 
         should("execute statement") {
             val stat = Sequence(
-                Assign("x", Add(Number(1), Number(1))),
-                Assign("y", Add(Variable("x"), Number(3)))
+                Assign(
+                    "x",
+                    Add(Number(1), Number(1))
+                ),
+                Assign(
+                    "y",
+                    Add(
+                        Variable("x"), Number(3)
+                    )
+                )
             )
             val e = stat.evaluate(env())
             e shouldContainKey "x"
@@ -243,8 +306,17 @@ class ExpressionText : ShouldSpec({
 
         should("execute while statement") {
             val stat = While(
-                LessThan(Variable("x"), Number(5)),
-                Assign("x", Multiply(Variable("x"), Number(3)))
+                LessThan(
+                    Variable(
+                        "x"
+                    ), Number(5)
+                ),
+                Assign(
+                    "x",
+                    Multiply(
+                        Variable("x"), Number(3)
+                    )
+                )
             )
 
             val e = stat.evaluate(env("x" to Number(1)))
