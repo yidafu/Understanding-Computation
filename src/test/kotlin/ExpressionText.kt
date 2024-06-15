@@ -3,7 +3,11 @@ import dev.yidafu.computation.Number
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.extensions.system.captureStandardOut
 import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.maps.shouldContain
+import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 
 class ExpressionText : ShouldSpec({
     context("Manual Build AST") {
@@ -31,7 +35,7 @@ class ExpressionText : ShouldSpec({
         }
 
         should("reduce to 14") {
-            var expr: Expression = Add(
+            val expr: Expression = Add(
                 Multiply(Number(1), Number(2)),
                 Multiply(Number(3), Number(4)),
             )
@@ -195,6 +199,60 @@ class ExpressionText : ShouldSpec({
                 |if (false) { x = x * 3; while (x < 5) { x = x * 3 } } else { do-nothing }, {:x => «9»}
                 |do-nothing, {:x => «9»}
             """.trimMargin()
+        }
+    }
+
+    context("Big Step") {
+        should("execute Number") {
+            val res = Number(23).evaluate(env())
+            (res as Number).value shouldBe 23
+        }
+
+        should("execute variable expression") {
+            val expr = Variable("x", ).evaluate(env("x" to Number(23)))
+            expr.shouldBeInstanceOf<Number>()
+            expr.value shouldBe 23
+        }
+
+        should("execute lessthan expression") {
+            val expr = LessThan(
+                Add(Variable("x"), Number(2)),
+                Variable("y")
+            ).evaluate(env("x" to Number(2), "y" to Number(5)))
+
+            expr.shouldBeInstanceOf<Bool>()
+            expr.value.shouldBeTrue()
+        }
+
+        should("execute statement") {
+            val stat = Sequence(
+                Assign("x", Add(Number(1), Number(1))),
+                Assign("y", Add(Variable("x"), Number(3)))
+            )
+            val e = stat.evaluate(env())
+            e shouldContainKey "x"
+            val x = e["x"]
+            x.shouldBeInstanceOf<Number>()
+            x.value shouldBe 2
+
+            e shouldContainKey "y"
+            val y = e["y"]
+            y.shouldBeInstanceOf<Number>()
+            y.value shouldBe 5
+        }
+
+        should("execute while statement") {
+            val stat = While(
+                LessThan(Variable("x"), Number(5)),
+                Assign("x", Multiply(Variable("x"), Number(3)))
+            )
+
+            val e = stat.evaluate(env("x" to Number(1)))
+
+            e shouldContainKey "x"
+            val x = e["x"]
+            x.shouldBeInstanceOf<Number>()
+            x.value shouldBe 9
         }
     }
 })

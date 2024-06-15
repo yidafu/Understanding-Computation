@@ -1,18 +1,18 @@
 package dev.yidafu.computation
 
 
-class Machine(var expr: Expression, var env: Environment) {
+class Machine(var stat: Node, var env: Environment) {
     fun step() {
-        val (expr, env) = expr.reduce(env)
-        this.expr = expr
+        val (stat, env) = stat.reduce(env)
+        this.stat = stat
         this.env = env
     }
 
     fun run() {
-        while (expr.reducible()) {
-            println("$expr, $env")
+        while (stat.reducible()) {
+            println("$stat, $env")
             step()
         }
-        println("$expr, $env")
+        println("$stat, $env")
     }
 }
